@@ -1,3 +1,6 @@
+mod game;
+
 fn main() {
-    println!("Hello, world!");
+    println!("Tetris");
+    game::start_game();
 }
