@@ -8,7 +8,7 @@ const GRID_LENGTH: usize = GRID_HEIGHT * GRID_WIDTH;
 const NEXT_TETROMINOS_QUEUE_SIZE: usize = 3;
 
 mod tetromino;
-mod cell_color;
+mod cell;
 
 mod state;
 

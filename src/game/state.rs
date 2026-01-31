@@ -1,9 +1,9 @@
 use crate::game;
-use game::cell_color::CellColor;
+use game::cell::Cell;
 use game::tetromino::Tetromino;
 
 pub struct State {
-    grid: [Option<CellColor>; game::GRID_LENGTH],
+    grid: [Cell; game::GRID_LENGTH],
     hold: Option<Tetromino>,
     next_tetrominos_queue: [Option<Tetromino>; game::NEXT_TETROMINOS_QUEUE_SIZE],
     score: i32,
@@ -14,7 +14,7 @@ pub struct State {
 impl State {
     pub fn new() -> State {
         State {
-            grid: [None; game::GRID_LENGTH],
+            grid: [Cell::Empty; game::GRID_LENGTH],
             hold: None,
             next_tetrominos_queue: [None; game::NEXT_TETROMINOS_QUEUE_SIZE],
             score: 0,
