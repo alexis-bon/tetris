@@ -23,7 +23,7 @@ impl State {
         }
     }
 
-    pub fn get_level(self) -> u32 {
+    pub fn get_level(&self) -> u32 {
         self.level
     }
 
