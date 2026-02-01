@@ -3,6 +3,8 @@ pub mod input;
 mod cursor_positions;
 mod vram;
 
+mod tetromino_sprite;
+
 use std::io::{self, Write};
 use crossterm::{
     terminal,
@@ -18,8 +20,10 @@ const SCREEN_WIDTH : usize = 69;
 const SCREEN_HEIGHT: usize = 22;
 const SCREEN_LENGTH: usize = SCREEN_WIDTH * SCREEN_HEIGHT - 2;
 
+const CELL_WIDTH: usize = 3;
+
 pub struct View {
-    vram: [u8; SCREEN_LENGTH],
+    pub vram: [u8; SCREEN_LENGTH],
     stdout: io::Stdout,
     
 }
