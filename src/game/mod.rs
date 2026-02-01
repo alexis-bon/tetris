@@ -1,3 +1,5 @@
+use std::{io, process::exit};
+
 mod core;
 mod view;
 
@@ -12,8 +14,22 @@ mod cell;
 
 mod state;
 
-pub fn start_game() {
+pub fn start_game() -> Result<(), String> {
     let mut state = state::State::new();
-    state.increment_level();
-    println!("Level {}", state.get_level());
+
+    let mut vram = match view::initialize_vram("data/screen.txt") {
+        Ok (vram) => vram,
+        Err(e) => return Err(e.to_string()),
+    };
+
+    vram[1] = b'A';
+
+    let vram_str = match String::from_utf8(vram.to_vec()) {
+        Ok(vram_str) => vram_str,
+        Err(e) => return Err(e.to_string()),
+    };
+
+    println!("{}", vram_str);
+
+    Ok(())
 }

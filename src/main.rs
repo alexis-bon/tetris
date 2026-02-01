@@ -2,5 +2,10 @@ mod game;
 
 fn main() {
     println!("Tetris");
-    game::start_game();
+    let result = game::start_game();
+
+    match result {
+        Ok(_) => println!("Bye bye !"),
+        Err(code) => println!("ERROR : Code {code}"),
+    }
 }
