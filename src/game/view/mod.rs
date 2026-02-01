@@ -1,3 +1,6 @@
+mod cursor_positions;
+mod vram;
+
 use std::{fs, io::{self, Write}, ptr};
 use crossterm::{
     terminal,
@@ -27,7 +30,7 @@ pub fn initialize_view(file_path: &str) -> io::Result<View> {
 
     Ok(
         View {
-            vram: initialize_vram(file_path)?,
+            vram: vram::initialize(file_path)?,
             stdout,
     })
 }
@@ -38,7 +41,7 @@ pub fn display_state(state: &State, view: &mut View) -> io::Result<()> {
         Err(e) => panic!("UTF8 error in display_state : {}", e.to_string()),
     };
 
-    view.vram[1] = if view.vram[1] < b'Z' {view.vram[1] + 1} else {b'A'};
+    vram::load_state_data(state, view);
 
     queue!(view.stdout, terminal::Clear(terminal::ClearType::All))?;
     queue!(view.stdout, terminal::Clear(terminal::ClearType::Purge))?;
@@ -55,24 +58,4 @@ pub fn close_view(view: &mut View) -> io::Result<()> {
     execute!(view.stdout, cursor::Show)?;
     terminal::disable_raw_mode()?;
     Ok(())
-}
-
-fn initialize_vram(file_path: &str) -> io::Result<[u8; SCREEN_LENGTH]> {
-    let mut file = fs::File::open(file_path)?;
-    let mut content_string = String::new();
-
-    io::Read::read_to_string(&mut file, &mut content_string)?;
-    content_string = content_string.replace("\n", "\n\r");
-    let content_bytes = content_string.as_bytes();
-
-    let mut vram = [b' '; SCREEN_LENGTH];
-    unsafe {
-        ptr::copy(
-            content_bytes.as_ptr(),
-            vram.as_mut_ptr(),
-            SCREEN_LENGTH
-        );
-    }
-
-    Ok(vram)
 }

@@ -31,6 +31,8 @@ pub fn start_game() -> Result<(), String> {
             io::Result::Err(e) => return Err(e.to_string())
         }
 
+        state.increment_level();
+
         std::thread::sleep(Duration::from_millis(40));
     }
     match view::close_view(&mut view_struct) {
