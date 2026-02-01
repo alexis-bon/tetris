@@ -10,12 +10,14 @@ const NEXT_TETROMINOS_QUEUE_SIZE: usize = 3;
 
 mod tetromino;
 mod cell;
+mod game_action;
 
 mod state;
 
 use std::io;
 use std::time::Duration;
 
+use crate::game::game_action::GameAction;
 
 pub fn start_game() -> Result<(), String> {
     let mut state = state::State::new();
@@ -31,7 +33,13 @@ pub fn start_game() -> Result<(), String> {
             io::Result::Err(e) => return Err(e.to_string())
         }
 
-        state.increment_level();
+        if let Some(next_action) = view::input::read() {
+            if let GameAction::Quit = next_action {
+                break;
+            } else {
+                core::perform_action(&mut state, next_action);
+            }
+        }
 
         std::thread::sleep(Duration::from_millis(40));
     }

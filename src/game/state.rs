@@ -27,7 +27,7 @@ impl State {
         self.level
     }
 
-    pub fn increment_level(&mut self) {
-        self.level += 1;
+    pub fn set_level(&mut self, level: u32) {
+        self.level = level;
     }
 }

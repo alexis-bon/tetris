@@ -1,7 +1,9 @@
+pub mod input;
+
 mod cursor_positions;
 mod vram;
 
-use std::{fs, io::{self, Write}, ptr};
+use std::io::{self, Write};
 use crossterm::{
     terminal,
     cursor,
@@ -47,8 +49,6 @@ pub fn display_state(state: &State, view: &mut View) -> io::Result<()> {
     queue!(view.stdout, terminal::Clear(terminal::ClearType::Purge))?;
     queue!(view.stdout, cursor::MoveTo(0, 0))?;
     queue!(view.stdout, Print(vram_str))?;
-    // queue!(view.stdout, Print("Tetris le jeu\n"))?;
-    // queue!(view.stdout, Print("0 2 4 6 8 0 2 4 6 8\n"))?;
     view.stdout.flush()?;
 
     Ok(())
