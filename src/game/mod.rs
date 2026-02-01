@@ -1,4 +1,3 @@
-use std::time;
 
 mod core;
 mod view;
@@ -14,30 +13,30 @@ mod cell;
 
 mod state;
 
+use std::io;
+use std::time::Duration;
+
+
 pub fn start_game() -> Result<(), String> {
     let mut state = state::State::new();
 
-    let mut vram = match view::initialize_vram("data/screen.txt") {
-        Ok (vram) => vram,
+    let mut view_struct = match view::initialize_view("data/screen.txt") {
+        Ok (view_struct) => view_struct,
         Err(e) => return Err(e.to_string()),
     };
-    
-    let mut i = 68;
+
     loop {
-        vram[1] = if vram[1] < b'Z' {vram[1] + 1} else {b'A'};
-        vram[i] = vram[1];
+        match view::display_state(&state, &mut view_struct) {
+            Ok(_) => (),
+            io::Result::Err(e) => return Err(e.to_string())
+        }
 
-        i = if i < 134 {i + 1} else {68};
-
-        let vram_str = match String::from_utf8(vram.to_vec()) {
-            Ok(vram_str) => vram_str,
-            Err(e) => return Err(e.to_string()),
-        };
-        print!("{esc}c", esc = 27 as char);
-        print!("{}", vram_str);
-
-        std::thread::sleep(time::Duration::from_millis(40));
+        std::thread::sleep(Duration::from_millis(40));
     }
+    match view::close_view(&mut view_struct) {
+        Ok(_) => (),
+        io::Result::Err(e) => return Err(e.to_string())
+    };
 
     Ok(())
 }
