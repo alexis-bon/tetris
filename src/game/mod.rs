@@ -1,4 +1,4 @@
-use std::{io, process::exit};
+use std::time;
 
 mod core;
 mod view;
@@ -21,15 +21,23 @@ pub fn start_game() -> Result<(), String> {
         Ok (vram) => vram,
         Err(e) => return Err(e.to_string()),
     };
+    
+    let mut i = 68;
+    loop {
+        vram[1] = if vram[1] < b'Z' {vram[1] + 1} else {b'A'};
+        vram[i] = vram[1];
 
-    vram[1] = b'A';
+        i = if i < 134 {i + 1} else {68};
 
-    let vram_str = match String::from_utf8(vram.to_vec()) {
-        Ok(vram_str) => vram_str,
-        Err(e) => return Err(e.to_string()),
-    };
+        let vram_str = match String::from_utf8(vram.to_vec()) {
+            Ok(vram_str) => vram_str,
+            Err(e) => return Err(e.to_string()),
+        };
+        print!("{esc}c", esc = 27 as char);
+        print!("{}", vram_str);
 
-    println!("{}", vram_str);
+        std::thread::sleep(time::Duration::from_millis(40));
+    }
 
     Ok(())
 }
