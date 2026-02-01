@@ -27,11 +27,9 @@ pub fn start_game() -> Result<(), String> {
         Err(e) => return Err(e.to_string()),
     };
 
+    let tmp = b'A';
+
     loop {
-        match view::display_state(&state, &mut view_struct) {
-            Ok(_) => (),
-            io::Result::Err(e) => return Err(e.to_string())
-        }
 
         if let Some(next_action) = view::input::read() {
             if let GameAction::Quit = next_action {
@@ -39,9 +37,16 @@ pub fn start_game() -> Result<(), String> {
             } else {
                 core::perform_action(&mut state, next_action);
             }
+        } else {
+            view_struct.vram[1] = if view_struct.vram[1] < b'Z' {view_struct.vram[1] + 1} else {b'A'};
         }
 
-        std::thread::sleep(Duration::from_millis(40));
+        match view::display_state(&state, &mut view_struct) {
+            Ok(_) => (),
+            io::Result::Err(e) => return Err(e.to_string())
+        }
+
+        std::thread::sleep(Duration::from_millis(50));
     }
     match view::close_view(&mut view_struct) {
         Ok(_) => (),
