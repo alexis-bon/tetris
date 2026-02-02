@@ -100,7 +100,7 @@ impl State {
         self.grid[cells_coords.2.to_grid_index()] = Cell::Full;
         self.grid[cells_coords.3.to_grid_index()] = Cell::Full;
 
-        self.set_new_random_current_tetromino();
+        self.set_next_tetromino_to_current();
     }
 
     fn clear_grid_lines_full(&mut self) {
@@ -122,7 +122,7 @@ impl State {
                 self.set_new_current_tetromino(tetromino);
                 self.set_can_store_flag(false);
             } else {
-                self.set_new_random_current_tetromino();
+                self.set_next_tetromino_to_current();
             }
         }
     }

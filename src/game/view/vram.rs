@@ -100,16 +100,15 @@ fn load_next_section(view: &mut View, state: &State) {
 }
 
 fn load_next_section_part(view: &mut View, state: &State, queue_index: usize, screen_center: usize) {
-    if let Some(tetromino) = state.get_in_next_tetromino_queue(queue_index) {
-        let tetromino_sprite = TetrominoSprite::display_sprite(
-            tetromino,
-            screen_center
-        );
-        load_tetromino_sprite(
-            view,
-            tetromino_sprite
-        );
-    }
+    let tetromino = state.get_in_next_tetromino_queue(queue_index);
+    let tetromino_sprite = TetrominoSprite::display_sprite(
+        tetromino,
+        screen_center
+    );
+    load_tetromino_sprite(
+        view,
+        tetromino_sprite
+    );
 }
 
 // fn load_tetromino_sprite(view: &mut View, tetromino: Option<Tetromino>, center_screen_position: usize) {

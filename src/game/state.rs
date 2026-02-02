@@ -86,7 +86,7 @@ pub struct State {
     current_tetromino: CurrentTetromino,
     hold: Option<Tetromino>,
     can_hold: bool,
-    next_tetrominos_queue: [Option<Tetromino>; game::NEXT_TETROMINOS_QUEUE_SIZE],
+    next_tetrominos_queue: [Tetromino; game::NEXT_TETROMINOS_QUEUE_SIZE],
     score: u32,
     level: u32,
     lines: u32,
@@ -96,6 +96,8 @@ pub struct State {
 
 impl State {
     pub fn new() -> State {
+        let mut rng = rand::rng();
+
         State {
             grid: [Cell::Empty; game::GRID_LENGTH],
             current_tetromino: CurrentTetromino {
@@ -105,8 +107,11 @@ impl State {
             },
             hold: None,
             can_hold: true,
-            // next_tetrominos_queue: [None; game::NEXT_TETROMINOS_QUEUE_SIZE],
-            next_tetrominos_queue: [Some(Tetromino::J), Some(Tetromino::O), None],
+            next_tetrominos_queue: [
+                Tetromino::from_index(rng.random()),
+                Tetromino::from_index(rng.random()),
+                Tetromino::from_index(rng.random())
+            ],
             score: 0,
             level: 1,
             lines: 0,
@@ -147,7 +152,7 @@ impl State {
         self.can_hold
     }
 
-    pub fn get_in_next_tetromino_queue(&self, index: usize) -> Option<Tetromino> {
+    pub fn get_in_next_tetromino_queue(&self, index: usize) -> Tetromino {
         self.next_tetrominos_queue[index]
     }
 
@@ -200,6 +205,15 @@ impl State {
         self.clock += 1
     }
 
+    pub fn pop_tetromino_queue(&mut self) -> Tetromino {
+        let tetromino = self.next_tetrominos_queue[0];
+        self.next_tetrominos_queue[0] = self.next_tetrominos_queue[1];
+        self.next_tetrominos_queue[1] = self.next_tetrominos_queue[2];
+        self.next_tetrominos_queue[2] = self.get_random_tetromino();
+
+        tetromino
+    }
+
     pub fn set_new_current_tetromino(&mut self, new_tetromino: Tetromino) {
         self.current_tetromino = CurrentTetromino {
             tetromino: new_tetromino,
@@ -208,9 +222,9 @@ impl State {
         };
     }
 
-    pub fn set_new_random_current_tetromino(&mut self) {
+    pub fn set_next_tetromino_to_current(&mut self) {
         self.current_tetromino = CurrentTetromino {
-            tetromino: self.get_random_tetromino(),
+            tetromino: self.pop_tetromino_queue(),
             position: GridCoords { i: 1, j: 4 },
             rotation: 0
         };
