@@ -7,6 +7,21 @@ pub enum Tetromino {
 
 const NB_TETROMINOS: u32 = 7;
 
+const SHAPES_I: [[(i32, i32); 3]; 2] = [
+    [( 0, -1), ( 0,  1), ( 0,  2)],
+    [(-1,  0), ( 1,  0), ( 2,  0)]
+];
+
+const SHAPE_O: [(i32, i32); 3] =
+    [(-1,  0), (-1,  1), ( 0,  1)];
+
+const SHAPES_T: [[(i32, i32); 3]; 4] = [
+    [( 0, -1), ( 0,  1), ( 1,  0)],
+    [(-1,  0), ( 0,  1), ( 1,  0)],
+    [(-1,  0), ( 0, -1), ( 0,  1)],
+    [(-1 , 0), ( 0, -1), ( 1,  0)]
+];
+
 const SHAPES_J: [[(i32, i32); 3]; 4] = [
     [(-1,  0), ( 1, -1), ( 1,  0)],
     [( 0, -1), ( 0,  1), ( 1,  1)],
@@ -14,15 +29,34 @@ const SHAPES_J: [[(i32, i32); 3]; 4] = [
     [(-1, -1), ( 0, -1), ( 0,  1)]
 ];
 
-const SHAPE_O: [(i32, i32); 3] =
-    [(-1,  0), (-1,  1), ( 0,  1)];
+const SHAPES_L: [[(i32, i32); 3]; 4] = [
+    [(-1, -1), (-1,  0), ( 1,  0)],
+    [(-1,  1), ( 0, -1), ( 0,  1)],
+    [(-1,  0), ( 1,  0), ( 1,  1)],
+    [( 0, -1), ( 0,  1), ( 1,  0)]
+];
+
+const SHAPES_S: [[(i32, i32); 3]; 2] = [
+    [(-1,  0), (-1,  1), ( 0, -1)],
+    [(-1,  0), ( 1,  0), ( 1,  1)]
+];
+
+const SHAPES_Z: [[(i32, i32); 3]; 2] = [
+    [(-1, -1), (-1,  0), ( 0,  1)],
+    [(-1,  1), ( 0,  1), ( 1,  0)]
+];
 
 impl Tetromino {
     /** Returns the shape used in sections HOLD and NEXT on the screen */
     pub fn get_display_shape(&self) -> [(i32, i32); 3] {
         match self {
+            Tetromino::I => SHAPES_I[0],
+            Tetromino::O => SHAPE_O,
+            Tetromino::T => SHAPES_T[2],
             Tetromino::J => SHAPES_J[3],
-            _ => SHAPE_O
+            Tetromino::L => SHAPES_L[1],
+            Tetromino::S => SHAPES_S[0],
+            Tetromino::Z => SHAPES_Z[0]
         }
     }
 
@@ -77,8 +111,13 @@ impl CurrentTetromino {
 
     pub fn get_shape(&self) -> [(i32, i32); 3] {
         match self.get_tetromino() {
+            Tetromino::I => SHAPES_I[self.get_rotation() % 2],
+            Tetromino::O => SHAPE_O,
+            Tetromino::T => SHAPES_T[self.get_rotation()],
             Tetromino::J => SHAPES_J[self.get_rotation()],
-            _ => SHAPE_O
+            Tetromino::L => SHAPES_L[self.get_rotation()],
+            Tetromino::S => SHAPES_S[self.get_rotation() % 2],
+            Tetromino::Z => SHAPES_Z[self.get_rotation() % 2]
         }
     }
 }
