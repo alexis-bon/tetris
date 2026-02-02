@@ -9,7 +9,7 @@ pub struct CurrentTetromino {
 }
 
 pub struct State {
-    grid: [Cell; game::GRID_LENGTH],
+    pub grid: [Cell; game::GRID_LENGTH],
     current_tetromino: CurrentTetromino,
     hold: Option<Tetromino>,
     next_tetrominos_queue: [Option<Tetromino>; game::NEXT_TETROMINOS_QUEUE_SIZE],
