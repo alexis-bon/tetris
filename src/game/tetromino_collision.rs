@@ -35,6 +35,17 @@ impl CurrentTetromino {
         Ordering::Equal
     }
 
+    /// Checks if some cells of the current tetromino are clipping with
+    /// bottom border of the grid
+    pub fn is_tetromino_clipping_vertically(&self) -> bool {
+        let cells_coords = self.get_cells_coords();
+
+        cells_coords.0.i >= game::GRID_HEIGHT ||
+        cells_coords.1.i >= game::GRID_HEIGHT ||
+        cells_coords.2.i >= game::GRID_HEIGHT ||
+        cells_coords.3.i >= game::GRID_HEIGHT
+    }
+
     pub fn get_left_collisions_cell_indexes(&self) -> Vec<Option<usize>> {
         self.get_collisions_cell_indexes((0, -1))
     }
@@ -44,7 +55,7 @@ impl CurrentTetromino {
     }
 
     pub fn get_down_collisions_cell_indexes(&self) -> Vec<Option<usize>> {
-        self.get_collisions_cell_indexes((0, 1))
+        self.get_collisions_cell_indexes((1, 0))
     }
 
     fn get_collisions_cell_indexes(&self, direction: (i32, i32)) -> Vec<Option<usize>> {

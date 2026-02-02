@@ -43,7 +43,7 @@ impl CurrentTetromino {
      *  Panics if current tetromino j coord is already 0
      */
     pub fn move_left(&mut self) {
-        if (self.position.j == 0) {
+        if self.position.j == 0 {
             panic!("Tried to move left current tetromino while it was already at column j = 0");
         }
         self.position.j -= 1
@@ -53,10 +53,30 @@ impl CurrentTetromino {
      *  Panics if current tetromino j coord is already GRID_WIDTH - 1
      */
     pub fn move_right(&mut self) {
-        if (self.position.j + 1 == game::GRID_WIDTH) {
-            panic!("Tried to move left current tetromino while it was already at column j = GRID_WIDTH - 1");
+        if self.position.j + 1 == game::GRID_WIDTH {
+            panic!("Tried to move right current tetromino while it was already at column j = GRID_WIDTH - 1");
         }
         self.position.j += 1
+    }
+
+    /** Move the current tetromino position one cell downwards.
+     *  Panics if current tetromino i coord is already GRID_HEIGHT - 1
+     */
+    pub fn move_down(&mut self) {
+        if self.position.i + 1 == game::GRID_HEIGHT {
+            panic!("Tried to move down current tetromino while it was already at row i = GRID_HEIGHT - 1");
+        }
+        self.position.i += 1
+    }
+
+    /** Move the current tetromino position one cell upwards.
+     *  Panics if current tetromino i coord is already 0
+     */
+    pub fn move_up(&mut self) {
+        if self.position.i  == 0 {
+            panic!("Tried to move up current tetromino while it was already at row i = 0");
+        }
+        self.position.i -= 1
     }
 }
 
@@ -67,7 +87,8 @@ pub struct State {
     next_tetrominos_queue: [Option<Tetromino>; game::NEXT_TETROMINOS_QUEUE_SIZE],
     score: u32,
     level: u32,
-    lines: u32
+    lines: u32,
+    clock: u128
 }
 
 impl State {
@@ -84,7 +105,8 @@ impl State {
             next_tetrominos_queue: [Some(Tetromino::J), Some(Tetromino::O), None],
             score: 1500,
             level: 3,
-            lines: 17
+            lines: 17,
+            clock: 0
         }
     }
 
@@ -127,6 +149,10 @@ impl State {
     pub fn get_lines(&self) -> u32 {
         self.lines
     }
+
+    pub fn get_clock(&self) -> u128 {
+        self.clock
+    }
 }
 
 impl State {
@@ -141,6 +167,10 @@ impl State {
 
     pub fn increment_rotation(&mut self) {
         self.current_tetromino.rotation = (self.current_tetromino.rotation + 1) % 4;
+    }
+
+    pub fn increment_clock(&mut self) {
+        self.clock += 1
     }
 
     pub fn set_stored_tetromino(&mut self, tetromino: Option<Tetromino>) {
