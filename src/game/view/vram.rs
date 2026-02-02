@@ -1,7 +1,8 @@
 use std::{fs, io, ptr};
 
 use crate::game;
-use crate::game::{cell::Cell, state::State, tetromino::Tetromino};
+use crate::game::state::{State, CurrentTetromino};
+use crate::game::cell::Cell;
 use crate::game::view::{self, View, cursor_positions, tetromino_sprite::TetrominoSprite};
 
 const TETROMINO_CELL_CHAR: u8 = b'H';
@@ -29,6 +30,7 @@ pub fn initialize(file_path: &str) -> io::Result<[u8; view::SCREEN_LENGTH]> {
 
 pub fn load_state_data(state: &State, view: &mut View) {
     load_grid(state, view);
+    load_current_tetromino_sprite(view, state.get_current_tetromino_ref());
     load_hold_section(view, state);
     load_next_section(view, state);
     load_uint(view, state.get_score(), cursor_positions::SCORE_COUNTER);
@@ -60,17 +62,29 @@ fn load_tetromino_cell_grid(view: &mut View, cell: &Cell, cell_grid_position: (u
     view.vram[cell_screen_position + 1] = cell_char;
 }
 
+fn load_current_tetromino_sprite(view: &mut View, current_tetromino: &CurrentTetromino) {
+    let sprite = TetrominoSprite::of_current_tetromino(&current_tetromino);
+
+    load_tetromino_sprite(view, sprite);
+}
+
 fn load_hold_section(view: &mut View, state: &State) {
     clear_section(
         view,
         cursor_positions::HOLD_GRID_ORIGIN,
         view::HOLD_SECTION_HEIGHT
     );
-    load_tetromino_sprite(
-        view,
-        state.get_hold_tetromino(),
-        cursor_positions::HOLD_GRID_CENTER
-    );
+
+    if let Some(tetromino) = state.get_stored_tetromino() {
+        let tetromino_sprite = TetrominoSprite::display_sprite(
+            tetromino,
+            cursor_positions::HOLD_GRID_CENTER
+        );
+        load_tetromino_sprite(
+            view,
+            tetromino_sprite
+        );
+    }
 }
 
 fn load_next_section(view: &mut View, state: &State) {
@@ -79,21 +93,57 @@ fn load_next_section(view: &mut View, state: &State) {
         cursor_positions::NEXT_GRID_ORIGIN,
         view::NEXT_SECTION_HEIGHT
     );
-    load_tetromino_sprite(
-        view,
-        state.get_in_next_tetromino_queue(0),
-        cursor_positions::NEXT_GRID_CENTER0
-    );
-    load_tetromino_sprite(
-        view,
-        state.get_in_next_tetromino_queue(1),
-        cursor_positions::NEXT_GRID_CENTER1
-    );
-    load_tetromino_sprite(
-        view,
-        state.get_in_next_tetromino_queue(2),
-        cursor_positions::NEXT_GRID_CENTER2
-    );
+
+    load_next_section_part(view, state, 0, cursor_positions::NEXT_GRID_CENTER0);
+    load_next_section_part(view, state, 1, cursor_positions::NEXT_GRID_CENTER1);
+    load_next_section_part(view, state, 2, cursor_positions::NEXT_GRID_CENTER2);
+}
+
+fn load_next_section_part(view: &mut View, state: &State, queue_index: usize, screen_center: usize) {
+    if let Some(tetromino) = state.get_in_next_tetromino_queue(queue_index) {
+        let tetromino_sprite = TetrominoSprite::display_sprite(
+            tetromino,
+            screen_center
+        );
+        load_tetromino_sprite(
+            view,
+            tetromino_sprite
+        );
+    }
+}
+
+// fn load_tetromino_sprite(view: &mut View, tetromino: Option<Tetromino>, center_screen_position: usize) {
+//     if let Some(tetromino) = tetromino {
+//         let sprite = TetrominoSprite::display_sprite(
+//             tetromino,
+//             center_screen_position
+//         );
+
+//         load_tetromino_cell(view, sprite.cells_grid_position.0);
+//         load_tetromino_cell(view, sprite.cells_grid_position.1);
+//         load_tetromino_cell(view, sprite.cells_grid_position.2);
+//         load_tetromino_cell(view, sprite.cells_grid_position.3);
+//     }
+// }
+
+fn load_tetromino_sprite(view: &mut View, sprite: TetrominoSprite) {
+    if let Some(cell0_screen_position) = sprite.cells_screen_position.0 {
+        load_tetromino_cell(view, cell0_screen_position);
+    }
+    if let Some(cell1_screen_position) = sprite.cells_screen_position.1 {
+        load_tetromino_cell(view, cell1_screen_position);
+    }
+    if let Some(cell2_screen_position) = sprite.cells_screen_position.2 {
+        load_tetromino_cell(view, cell2_screen_position);
+    }
+    if let Some(cell3_screen_position) = sprite.cells_screen_position.3 {
+        load_tetromino_cell(view, cell3_screen_position);
+    }
+}
+
+fn load_tetromino_cell(view: &mut View, screen_position: usize) {
+    view.vram[screen_position] = TETROMINO_CELL_CHAR;
+    view.vram[screen_position + 1] = TETROMINO_CELL_CHAR;
 }
 
 fn clear_section(view: &mut View, origin: usize, height: usize) {
@@ -109,25 +159,6 @@ fn clear_section_line(view: &mut View, line_origin: usize) {
             view.vram[index] = EMPTY_CELL_CHAR;
         }
     }
-}
-
-fn load_tetromino_sprite(view: &mut View, tetromino: Option<Tetromino>, center_screen_position: usize) {
-    if let Some(tetromino) = tetromino {
-        let sprite = TetrominoSprite::display_sprite(
-            tetromino,
-            center_screen_position
-        );
-
-        load_tetromino_cell(view, sprite.cells_grid_position.0);
-        load_tetromino_cell(view, sprite.cells_grid_position.1);
-        load_tetromino_cell(view, sprite.cells_grid_position.2);
-        load_tetromino_cell(view, sprite.cells_grid_position.3);
-    }
-}
-
-fn load_tetromino_cell(view: &mut View, screen_position: usize) {
-    view.vram[screen_position] = TETROMINO_CELL_CHAR;
-    view.vram[screen_position + 1] = TETROMINO_CELL_CHAR;
 }
 
 fn load_uint(view: &mut View, n: u32, position: usize) {
