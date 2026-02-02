@@ -1,7 +1,40 @@
+use std::cmp::Ordering;
+
 use crate::game;
 use crate::game::state::{CurrentTetromino, GridCoords};
 
 impl CurrentTetromino {
+
+    /// Check if some cells of the tetromino is clipping with left or right border
+    ///
+    /// ### Returns :
+    /// - `Ordering::Less` if there is clipping with border left
+    /// - `Ordering::Greater` if there is clipping with border right
+    /// - `Ordering::Equal` if there is no horizontal clipping
+    pub fn is_tetromino_clipping_horizontaly(&self) -> Ordering {
+        let cells_coords = self.get_cells_coords();
+
+        // clipping into left border : check overflow of j
+        if  cells_coords.0.j > 1000000 ||
+            cells_coords.1.j > 1000000 ||
+            cells_coords.2.j > 1000000 ||
+            cells_coords.3.j > 1000000 {
+
+            return Ordering::Less;
+        }
+
+        // clipping into right border
+        if  cells_coords.0.j >= game::GRID_WIDTH ||
+            cells_coords.1.j >= game::GRID_WIDTH ||
+            cells_coords.2.j >= game::GRID_WIDTH ||
+            cells_coords.3.j >= game::GRID_WIDTH {
+
+            return Ordering::Greater;
+        }
+
+        Ordering::Equal
+    }
+
     pub fn get_left_collisions_cell_indexes(&self) -> Vec<Option<usize>> {
         self.get_collisions_cell_indexes((0, -1))
     }

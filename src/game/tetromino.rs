@@ -1,6 +1,4 @@
-use std::{cell, vec};
-
-use crate::game::{self, state::{CurrentTetromino, GridCoords}};
+use crate::game::state::{CurrentTetromino, GridCoords};
 
 #[derive(Copy, Clone)]
 pub enum Tetromino {
@@ -52,6 +50,7 @@ impl CurrentTetromino {
         (center, coords_cell0, coords_cell1, coords_cell2)
     }
 
+    /** Returns true if given cell is one of this tetromino */
     pub fn is_cell_part_of_me(&self, cell_coords: &GridCoords) -> bool {
         let cells_coords = self.get_cells_coords();
 
