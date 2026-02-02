@@ -105,12 +105,16 @@ impl State {
             hold: None,
             // next_tetrominos_queue: [None; game::NEXT_TETROMINOS_QUEUE_SIZE],
             next_tetrominos_queue: [Some(Tetromino::J), Some(Tetromino::O), None],
-            score: 1500,
-            level: 3,
-            lines: 17,
+            score: 0,
+            level: 1,
+            lines: 0,
             clock: 0,
             rng: rand::rng()
         }
+    }
+
+    pub fn get_grid_cell(&self, i: usize, j: usize ) -> Cell {
+        self.grid[i * game::GRID_WIDTH + j]
     }
 
     pub fn get_current_tetromino_ref(&self) -> &CurrentTetromino {
@@ -156,9 +160,23 @@ impl State {
     pub fn get_clock(&self) -> u128 {
         self.clock
     }
+
+    pub fn is_grid_line_full(&self, i: usize) -> bool {
+        for j in 0..game::GRID_WIDTH {
+            if self.grid[i * game::GRID_WIDTH + j] == Cell::Empty {
+                return false;
+            }
+        }
+
+        true
+    }
 }
 
 impl State {
+    pub fn set_grid_cell(&mut self, i: usize, j: usize, cell: Cell) {
+        self.grid[i * game::GRID_WIDTH + j] = cell
+    }
+
     pub fn increment_level(&mut self) {
         self.level += 1;
     }
@@ -194,5 +212,35 @@ impl State {
 
     pub fn set_stored_tetromino(&mut self, tetromino: Option<Tetromino>) {
         self.hold = tetromino;
+    }
+
+    pub fn clear_grid_line(&mut self, i: usize) {
+        for j in 0..game::GRID_WIDTH {
+            self.set_grid_cell(i, j, Cell::Empty);
+        }
+    }
+
+    pub fn shift_tetromino_cells_down(&mut self, row_limit: usize) {
+        if row_limit == 0 {
+            panic!("Tried to shift tetromino cells down with row_limit = 0");
+        }
+
+        for j in 0..game::GRID_WIDTH {
+            self.shift_tetromino_column_down(row_limit, j);
+        }
+    }
+
+    fn shift_tetromino_column_down(&mut self, row_limit: usize, j: usize) {
+        let mut i = row_limit - 1;
+        let mut cell = self.get_grid_cell(i, j);
+
+        while i > 0 {
+            self.set_grid_cell(i + 1, j, cell);
+            i -= 1;
+            cell = self.get_grid_cell(i, j);
+        }
+
+        self.set_grid_cell(1, j, cell);
+        self.set_grid_cell(0, j, Cell::Empty);
     }
 }

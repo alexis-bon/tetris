@@ -1,8 +1,9 @@
 use std::cmp::Ordering;
 
-use crate::game::{game_action::GameAction, state::State, cell::Cell};
+use crate::game::{self, cell::Cell, game_action::GameAction, state::State};
 
-const DEFAULT_TETROMINO_FALLING_TIME: u128 = 25;
+const LINES_FULL_CHECKING_TIME: u128 = 10;
+const DEFAULT_TETROMINO_FALLING_TIME: u128 = 80;
 const DELTA_FALLING_TIME: u128 = 5;
 
 impl State {
@@ -43,6 +44,7 @@ impl State {
 
         if collisions.contains(&None) {
             self.stick_current_tetromino();
+            return;
         }
 
         if self.is_collision_with_other_tetromino(collisions) {
@@ -100,12 +102,22 @@ impl State {
 
         self.set_new_current_tetromino();
     }
+
+    fn clear_grid_lines_full(&mut self) {
+    for i in 0..game::GRID_HEIGHT {
+        if self.is_grid_line_full(i) {
+            self.clear_grid_line(i);
+            self.shift_tetromino_cells_down(i);
+        }
+    }
+}
 }
 
 pub fn perform_action(state: &mut State, action: GameAction) {
     match action {
         GameAction::Left => state.move_current_tetromino_left(),
         GameAction::Right => state.move_current_tetromino_right(),
+        GameAction::Down => state.move_current_tetromino_down(),
         GameAction::Rotate => state.rotate_current_tetromino(),
         _ => ()
     }
@@ -118,5 +130,9 @@ pub fn increment_clock_and_trigger_events(state: &mut State) {
         (DEFAULT_TETROMINO_FALLING_TIME - state.get_level() as u128 * DELTA_FALLING_TIME) == 0 {
 
         state.move_current_tetromino_down();
+    }
+
+    if state.get_clock() % LINES_FULL_CHECKING_TIME == 0 {
+        state.clear_grid_lines_full();
     }
 }
