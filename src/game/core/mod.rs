@@ -1,6 +1,6 @@
 use std::cmp::Ordering;
 
-use crate::game::{game_action::GameAction, state::{State}};
+use crate::game::{game_action::GameAction, state::State, cell::Cell};
 
 const DEFAULT_TETROMINO_FALLING_TIME: u128 = 25;
 const DELTA_FALLING_TIME: u128 = 5;
@@ -11,16 +11,14 @@ impl State {
             .get_current_tetromino_ref()
             .get_left_collisions_cell_indexes();
 
-        if collisions.contains(&None) {
+        if  collisions.contains(&None) ||
+            self.is_collision_with_other_tetromino(collisions) {
+
             return
         }
 
-        // TODO : test if some collisions contains a full cell,
-        //        and if so stick the current tetromino
-
-        self
-            .get_current_tetromino_mutref()
-            .move_left();
+        self.get_current_tetromino_mutref()
+        .move_left();
     }
 
     fn move_current_tetromino_right(&mut self) {
@@ -28,16 +26,14 @@ impl State {
             .get_current_tetromino_ref()
             .get_right_collisions_cell_indexes();
 
-        if collisions.contains(&None) {
+        if collisions.contains(&None)  ||
+            self.is_collision_with_other_tetromino(collisions) {
+
             return
         }
 
-        // TODO : test if some collisions contains a full cell,
-        //        and if so stick the current tetromino
-
-        self
-            .get_current_tetromino_mutref()
-            .move_right();
+        self.get_current_tetromino_mutref()
+        .move_right();
     }
 
     fn move_current_tetromino_down(&mut self) {
@@ -46,14 +42,27 @@ impl State {
             .get_down_collisions_cell_indexes();
 
         if collisions.contains(&None) {
-            return
+            self.stick_current_tetromino();
         }
 
-        // TODO : test if some collisions contains a full cell,
-        //        and if so stick the current tetromino
-
-        self.get_current_tetromino_mutref()
+        if self.is_collision_with_other_tetromino(collisions) {
+            self.stick_current_tetromino();
+        } else {
+            self.get_current_tetromino_mutref()
             .move_down();
+        }
+    }
+
+    fn is_collision_with_other_tetromino(&mut self, collisions: Vec<Option<usize>>) -> bool {
+        for collision in collisions {
+            if let Some(collision_index) = collision {
+                if self.grid[collision_index] == Cell::Full {
+                    return true;
+                }
+            }
+        }
+
+        false
     }
 
     fn rotate_current_tetromino(&mut self) {
@@ -78,6 +87,18 @@ impl State {
                 .move_up();
         }
 
+    }
+
+    fn stick_current_tetromino(&mut self) {
+        let old_tetromino_ref = self.get_current_tetromino_ref();
+        let cells_coords = old_tetromino_ref.get_cells_coords();
+
+        self.grid[cells_coords.0.to_grid_index()] = Cell::Full;
+        self.grid[cells_coords.1.to_grid_index()] = Cell::Full;
+        self.grid[cells_coords.2.to_grid_index()] = Cell::Full;
+        self.grid[cells_coords.3.to_grid_index()] = Cell::Full;
+
+        self.set_new_current_tetromino();
     }
 }
 

@@ -5,6 +5,8 @@ pub enum Tetromino {
     I, O, T, J, L, S, Z
 }
 
+const NB_TETROMINOS: u32 = 7;
+
 const SHAPES_J: [[(i32, i32); 3]; 4] = [
     [(-1,  0), ( 1, -1), ( 1,  0)],
     [( 0, -1), ( 0,  1), ( 1,  1)],
@@ -21,6 +23,19 @@ impl Tetromino {
         match self {
             Tetromino::J => SHAPES_J[3],
             _ => SHAPE_O
+        }
+    }
+
+    pub fn from_index(index: u32) -> Tetromino {
+        match index % NB_TETROMINOS {
+            0 => Tetromino::I,
+            1 => Tetromino::O,
+            2 => Tetromino::T,
+            3 => Tetromino::J,
+            4 => Tetromino::L,
+            5 => Tetromino::S,
+            6 => Tetromino::Z,
+            _ => panic!("Maths are not good")
         }
     }
 }

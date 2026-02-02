@@ -1,6 +1,7 @@
 use crate::game;
 use game::cell::Cell;
 use game::tetromino::Tetromino;
+use rand::{self, Rng};
 
 #[derive(Clone, Copy)]
 pub struct GridCoords {
@@ -88,7 +89,8 @@ pub struct State {
     score: u32,
     level: u32,
     lines: u32,
-    clock: u128
+    clock: u128,
+    rng: rand::rngs::ThreadRng
 }
 
 impl State {
@@ -106,7 +108,8 @@ impl State {
             score: 1500,
             level: 3,
             lines: 17,
-            clock: 0
+            clock: 0,
+            rng: rand::rng()
         }
     }
 
@@ -171,6 +174,22 @@ impl State {
 
     pub fn increment_clock(&mut self) {
         self.clock += 1
+    }
+
+    pub fn set_new_current_tetromino(&mut self) {
+        self.current_tetromino = CurrentTetromino {
+            tetromino: self.get_random_tetromino(),
+            position: GridCoords { i: 1, j: 4 },
+            rotation: 0
+        };
+    }
+
+    fn get_random_tetromino(&mut self) -> Tetromino {
+        Tetromino::from_index(self.get_random_u32())
+    }
+
+    fn get_random_u32(&mut self) -> u32 {
+        self.rng.random::<u32>()
     }
 
     pub fn set_stored_tetromino(&mut self, tetromino: Option<Tetromino>) {
