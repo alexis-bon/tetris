@@ -5,7 +5,7 @@ fn main() {
     let result = game::start_game();
 
     match result {
-        Ok(_) => println!("Bye bye !"),
+        Ok(_) => print!("{esc}c\n", esc = 27 as char),
         Err(code) => println!("ERROR : Code {code}"),
     }
 }
