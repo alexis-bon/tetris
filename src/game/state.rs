@@ -13,7 +13,7 @@ pub struct State {
     current_tetromino: CurrentTetromino,
     hold: Option<Tetromino>,
     next_tetrominos_queue: [Option<Tetromino>; game::NEXT_TETROMINOS_QUEUE_SIZE],
-    score: i32,
+    score: u32,
     level: u32,
     lines: u32
 }
@@ -30,9 +30,9 @@ impl State {
             hold: None,
             // next_tetrominos_queue: [None; game::NEXT_TETROMINOS_QUEUE_SIZE],
             next_tetrominos_queue: [Some(Tetromino::J), Some(Tetromino::O), None],
-            score: 0,
-            level: 1,
-            lines: 0
+            score: 1500,
+            level: 3,
+            lines: 17
         }
     }
 
@@ -56,8 +56,16 @@ impl State {
         self.next_tetrominos_queue[index]
     }
 
+    pub fn get_score(&self) -> u32 {
+        self.score
+    }
+
     pub fn get_level(&self) -> u32 {
         self.level
+    }
+
+    pub fn get_lines(&self) -> u32 {
+        self.lines
     }
 }
 

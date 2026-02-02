@@ -31,7 +31,9 @@ pub fn load_state_data(state: &State, view: &mut View) {
     load_grid(state, view);
     load_hold_section(view, state);
     load_next_section(view, state);
+    load_uint(view, state.get_score(), cursor_positions::SCORE_COUNTER);
     load_uint(view, state.get_level(), cursor_positions::LEVEL_COUNTER);
+    load_uint(view, state.get_lines(), cursor_positions::LINES_COUNTER);
 }
 
 fn load_grid(state: &State, view: &mut View) {
