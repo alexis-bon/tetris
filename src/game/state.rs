@@ -47,6 +47,10 @@ impl State {
         self.current_tetromino.rotation
     }
 
+    pub fn get_hold_tetromino(&self) -> Option<Tetromino> {
+        self.hold
+    }
+
     pub fn get_level(&self) -> u32 {
         self.level
     }
@@ -64,5 +68,10 @@ impl State {
 
     pub fn increment_rotation(&mut self) {
         self.current_tetromino.rotation = (self.current_tetromino.rotation + 1) % 4;
+    }
+
+    pub fn store_current_tetromino(&mut self) {
+        // temporary function, to be completed
+        self.hold = Some(self.get_current_tetromino());
     }
 }

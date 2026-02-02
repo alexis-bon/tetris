@@ -21,6 +21,9 @@ const SCREEN_HEIGHT: usize = 22;
 const SCREEN_LENGTH: usize = SCREEN_WIDTH * SCREEN_HEIGHT - 2;
 
 const CELL_WIDTH: usize = 3;
+const SECTION_WIDTH: usize = 4 * CELL_WIDTH;
+const HOLD_SECTION_HEIGHT: usize = 2;
+const NEXT_SECTION_HEIGHT: usize = 8;
 
 pub struct View {
     pub vram: [u8; SCREEN_LENGTH],

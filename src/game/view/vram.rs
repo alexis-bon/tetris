@@ -1,10 +1,11 @@
 use std::{fs, io, ptr};
 
 use crate::game;
-use crate::game::{cell::Cell, state::State};
+use crate::game::{cell::Cell, state::State, tetromino::Tetromino};
 use crate::game::view::{self, View, cursor_positions, tetromino_sprite::TetrominoSprite};
 
 const TETROMINO_CELL_CHAR: u8 = b'H';
+const EMPTY_CELL_CHAR: u8 = b' ';
 
 pub fn initialize(file_path: &str) -> io::Result<[u8; view::SCREEN_LENGTH]> {
     let mut file = fs::File::open(file_path)?;
@@ -27,22 +28,80 @@ pub fn initialize(file_path: &str) -> io::Result<[u8; view::SCREEN_LENGTH]> {
 }
 
 pub fn load_state_data(state: &State, view: &mut View) {
-    clear_grid(view);
-    load_uint(view, state.get_level(), cursor_positions::LEVEL_COUNTER);
     load_grid(state, view);
+    load_hold_section(view, state);
+    load_uint(view, state.get_level(), cursor_positions::LEVEL_COUNTER);
 }
 
-fn clear_grid(view: &mut View) {
-    for index in cursor_positions::GRID_ORIGIN..cursor_positions::GRID_END {
+fn load_grid(state: &State, view: &mut View) {
+    for (index, cell) in state.grid.iter().enumerate() {
+        let cell_grid_position = (
+            index / game::GRID_WIDTH,
+            index % game::GRID_WIDTH
+        );
+
+        load_tetromino_cell_grid(view, cell, cell_grid_position);
+    }
+}
+
+fn load_tetromino_cell_grid(view: &mut View, cell: &Cell, cell_grid_position: (usize, usize)) {
+    let cell_char = match cell {
+        Cell::Full => TETROMINO_CELL_CHAR,
+        Cell::Empty => EMPTY_CELL_CHAR,
+    };
+    let cell_screen_position = cursor_positions::GRID_ORIGIN
+        + cell_grid_position.0 * view::SCREEN_WIDTH
+        + cell_grid_position.1 * view::CELL_WIDTH;
+
+    view.vram[cell_screen_position] = cell_char;
+    view.vram[cell_screen_position + 1] = cell_char;
+}
+
+fn clear_section(view: &mut View, origin: usize, height: usize) {
+    for k in 0..height {
+        let line_origin = origin + k * view::SCREEN_WIDTH;
+        clear_section_line(view, line_origin);
+    }
+}
+
+fn clear_section_line(view: &mut View, line_origin: usize) {
+    for index in line_origin..(line_origin + view::SECTION_WIDTH) {
         if view.vram[index] == TETROMINO_CELL_CHAR {
-            view.vram[index] = b' ';
+            view.vram[index] = EMPTY_CELL_CHAR;
         }
     }
 }
 
-fn digit_to_utf8(digit: u8) -> u8 {
-    let utf8_zero = b'0' as u8;
-    utf8_zero + digit
+fn load_hold_section(view: &mut View, state: &State) {
+    clear_section(
+        view,
+        cursor_positions::HOLD_GRID_ORIGIN,
+        view::HOLD_SECTION_HEIGHT
+    );
+    load_tetromino_sprite(
+        view,
+        state.get_hold_tetromino(),
+        cursor_positions::HOLD_GRID_CENTER
+    );
+}
+
+fn load_tetromino_sprite(view: &mut View, tetromino: Option<Tetromino>, center_screen_position: usize) {
+    if let Some(tetromino) = tetromino {
+        let sprite = TetrominoSprite::display_sprite(
+            tetromino,
+            center_screen_position
+        );
+
+        load_tetromino_cell(view, sprite.cells_grid_position.0);
+        load_tetromino_cell(view, sprite.cells_grid_position.1);
+        load_tetromino_cell(view, sprite.cells_grid_position.2);
+        load_tetromino_cell(view, sprite.cells_grid_position.3);
+    }
+}
+
+fn load_tetromino_cell(view: &mut View, screen_position: usize) {
+    view.vram[screen_position] = TETROMINO_CELL_CHAR;
+    view.vram[screen_position + 1] = TETROMINO_CELL_CHAR;
 }
 
 fn load_uint(view: &mut View, n: u32, position: usize) {
@@ -59,26 +118,7 @@ fn load_uint(view: &mut View, n: u32, position: usize) {
     view.vram[position - 4] = digit4;
 }
 
-fn load_grid(state: &State, view: &mut View) {
-    for (index, cell) in state.grid.iter().enumerate() {
-        let cell_grid_position = (
-            index / game::GRID_WIDTH,
-            index % game::GRID_WIDTH
-        );
-
-        load_tetromino_cell(view, cell, cell_grid_position);
-    }
-}
-
-fn load_tetromino_cell(view: &mut View, cell: &Cell, cell_grid_position: (usize, usize)) {
-    let cell_char = match cell {
-        Cell::Full => b'H',
-        Cell::Empty => b' ',
-    };
-    let cell_screen_position = cursor_positions::GRID_ORIGIN
-        + cell_grid_position.0 * view::SCREEN_WIDTH
-        + cell_grid_position.1 * view::CELL_WIDTH;
-
-    view.vram[cell_screen_position] = cell_char;
-    view.vram[cell_screen_position + 1] = cell_char;
+fn digit_to_utf8(digit: u8) -> u8 {
+    let utf8_zero = b'0' as u8;
+    utf8_zero + digit
 }

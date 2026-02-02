@@ -18,7 +18,7 @@ const SHAPES_J: [[(i32, i32); 3]; 4] = [
 ];
 
 const SHAPE_O: [(i32, i32); 3] =
-    [( 0,  1),  ( 1,  0), ( 1,  1)];
+    [(-1,  0), (-1,  1), ( 0,  1)];
 
 impl TetrominoSprite {
     // pub fn new(tetromino: Tetromino, position: usize, rotation: usize) -> TetrominoSprite {
@@ -31,6 +31,18 @@ impl TetrominoSprite {
     //     }
     // }
 
+    pub fn display_sprite(tetromino: Tetromino, center_screen_position: usize)
+        -> TetrominoSprite {
+        
+        TetrominoSprite {
+            tetromino,
+            cells_grid_position: Self::get_screen_cells_from_shape(
+                    center_screen_position,
+                    Self::get_display_shape(tetromino)
+                )
+        }
+    }
+
     pub fn current_tetromino(
         tetromino: Tetromino,
         grid_position: (usize, usize),
@@ -39,7 +51,7 @@ impl TetrominoSprite {
 
         TetrominoSprite {
             tetromino,
-            cells_grid_position: Self::get_cells_from_shape(
+            cells_grid_position: Self::get_grid_cells_from_shape(
                 grid_position,
                 Self::get_shape(tetromino, rotation)
             )
@@ -53,7 +65,15 @@ impl TetrominoSprite {
         }
     }
 
-    fn get_cells_from_shape(grid_center: (usize, usize), shape: [(i32, i32); 3])
+    /** Returns the shape used in sections HOLD and NEXT on the screen */
+    fn get_display_shape(tetromino: Tetromino) -> [(i32, i32); 3] {
+        match tetromino {
+            Tetromino::J => SHAPES_J[3],
+            _ => SHAPE_O
+        }
+    }
+
+    fn get_grid_cells_from_shape(grid_center: (usize, usize), shape: [(i32, i32); 3])
         -> (usize, usize, usize, usize)
     {
         let grid_center_i32 = (grid_center.0 as i32, grid_center.1 as i32);
@@ -66,6 +86,18 @@ impl TetrominoSprite {
             (center_i32 + shape[0].0 * SCREEN_WIDTH_I32 + shape[0].1 * CELL_WIDTH_I32) as usize,
             (center_i32 + shape[1].0 * SCREEN_WIDTH_I32 + shape[1].1 * CELL_WIDTH_I32) as usize,
             (center_i32 + shape[2].0 * SCREEN_WIDTH_I32 + shape[2].1 * CELL_WIDTH_I32) as usize,
+        )
+    }
+
+    fn get_screen_cells_from_shape(screen_center: usize, shape: [(i32, i32); 3])
+        -> (usize, usize, usize, usize) {
+
+        let screen_center_i32 = screen_center as i32;
+        (
+            screen_center,
+            (screen_center_i32 + shape[0].0 * SCREEN_WIDTH_I32 + shape[0].1 * CELL_WIDTH_I32) as usize,
+            (screen_center_i32 + shape[1].0 * SCREEN_WIDTH_I32 + shape[1].1 * CELL_WIDTH_I32) as usize,
+            (screen_center_i32 + shape[2].0 * SCREEN_WIDTH_I32 + shape[2].1 * CELL_WIDTH_I32) as usize,
         )
     }
 }
