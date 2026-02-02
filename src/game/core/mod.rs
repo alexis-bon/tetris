@@ -100,7 +100,7 @@ impl State {
         self.grid[cells_coords.2.to_grid_index()] = Cell::Full;
         self.grid[cells_coords.3.to_grid_index()] = Cell::Full;
 
-        self.set_new_current_tetromino();
+        self.set_new_random_current_tetromino();
     }
 
     fn clear_grid_lines_full(&mut self) {
@@ -111,6 +111,21 @@ impl State {
         }
     }
 }
+
+    fn swap_current_stored_tetrominos(&mut self) {
+        if self.can_store() {
+
+            let old_stored = self.get_stored_tetromino();
+            self.set_stored_tetromino(Some(self.get_current_tetromino()));
+            
+            if let Some(tetromino) = old_stored {
+                self.set_new_current_tetromino(tetromino);
+                self.set_can_store_flag(false);
+            } else {
+                self.set_new_random_current_tetromino();
+            }
+        }
+    }
 }
 
 pub fn perform_action(state: &mut State, action: GameAction) {
@@ -119,6 +134,7 @@ pub fn perform_action(state: &mut State, action: GameAction) {
         GameAction::Right => state.move_current_tetromino_right(),
         GameAction::Down => state.move_current_tetromino_down(),
         GameAction::Rotate => state.rotate_current_tetromino(),
+        GameAction::Store => state.swap_current_stored_tetrominos(),
         _ => ()
     }
 }

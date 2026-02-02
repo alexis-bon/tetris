@@ -85,6 +85,7 @@ pub struct State {
     pub grid: [Cell; game::GRID_LENGTH],
     current_tetromino: CurrentTetromino,
     hold: Option<Tetromino>,
+    can_hold: bool,
     next_tetrominos_queue: [Option<Tetromino>; game::NEXT_TETROMINOS_QUEUE_SIZE],
     score: u32,
     level: u32,
@@ -103,6 +104,7 @@ impl State {
                 rotation: 0
             },
             hold: None,
+            can_hold: true,
             // next_tetrominos_queue: [None; game::NEXT_TETROMINOS_QUEUE_SIZE],
             next_tetrominos_queue: [Some(Tetromino::J), Some(Tetromino::O), None],
             score: 0,
@@ -139,6 +141,10 @@ impl State {
 
     pub fn get_stored_tetromino(&self) -> Option<Tetromino> {
         self.hold
+    }
+
+    pub fn can_store(&self) -> bool {
+        self.can_hold
     }
 
     pub fn get_in_next_tetromino_queue(&self, index: usize) -> Option<Tetromino> {
@@ -194,12 +200,22 @@ impl State {
         self.clock += 1
     }
 
-    pub fn set_new_current_tetromino(&mut self) {
+    pub fn set_new_current_tetromino(&mut self, new_tetromino: Tetromino) {
+        self.current_tetromino = CurrentTetromino {
+            tetromino: new_tetromino,
+            position: GridCoords { i: 1, j: 4 },
+            rotation: 0
+        };
+    }
+
+    pub fn set_new_random_current_tetromino(&mut self) {
         self.current_tetromino = CurrentTetromino {
             tetromino: self.get_random_tetromino(),
             position: GridCoords { i: 1, j: 4 },
             rotation: 0
         };
+
+        self.set_can_store_flag(true);
     }
 
     fn get_random_tetromino(&mut self) -> Tetromino {
@@ -214,10 +230,16 @@ impl State {
         self.hold = tetromino;
     }
 
+    pub fn set_can_store_flag(&mut self, value: bool) {
+        self.can_hold = value
+    }
+
     pub fn clear_grid_line(&mut self, i: usize) {
         for j in 0..game::GRID_WIDTH {
             self.set_grid_cell(i, j, Cell::Empty);
         }
+
+        self.lines += 1
     }
 
     pub fn shift_tetromino_cells_down(&mut self, row_limit: usize) {
