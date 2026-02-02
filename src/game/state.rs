@@ -28,7 +28,8 @@ impl State {
                 rotation: 0
             },
             hold: None,
-            next_tetrominos_queue: [None; game::NEXT_TETROMINOS_QUEUE_SIZE],
+            // next_tetrominos_queue: [None; game::NEXT_TETROMINOS_QUEUE_SIZE],
+            next_tetrominos_queue: [Some(Tetromino::J), Some(Tetromino::O), None],
             score: 0,
             level: 1,
             lines: 0
@@ -49,6 +50,10 @@ impl State {
 
     pub fn get_hold_tetromino(&self) -> Option<Tetromino> {
         self.hold
+    }
+
+    pub fn get_in_next_tetromino_queue(&self, index: usize) -> Option<Tetromino> {
+        self.next_tetrominos_queue[index]
     }
 
     pub fn get_level(&self) -> u32 {

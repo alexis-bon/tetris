@@ -30,6 +30,7 @@ pub fn initialize(file_path: &str) -> io::Result<[u8; view::SCREEN_LENGTH]> {
 pub fn load_state_data(state: &State, view: &mut View) {
     load_grid(state, view);
     load_hold_section(view, state);
+    load_next_section(view, state);
     load_uint(view, state.get_level(), cursor_positions::LEVEL_COUNTER);
 }
 
@@ -57,6 +58,42 @@ fn load_tetromino_cell_grid(view: &mut View, cell: &Cell, cell_grid_position: (u
     view.vram[cell_screen_position + 1] = cell_char;
 }
 
+fn load_hold_section(view: &mut View, state: &State) {
+    clear_section(
+        view,
+        cursor_positions::HOLD_GRID_ORIGIN,
+        view::HOLD_SECTION_HEIGHT
+    );
+    load_tetromino_sprite(
+        view,
+        state.get_hold_tetromino(),
+        cursor_positions::HOLD_GRID_CENTER
+    );
+}
+
+fn load_next_section(view: &mut View, state: &State) {
+    clear_section(
+        view,
+        cursor_positions::NEXT_GRID_ORIGIN,
+        view::NEXT_SECTION_HEIGHT
+    );
+    load_tetromino_sprite(
+        view,
+        state.get_in_next_tetromino_queue(0),
+        cursor_positions::NEXT_GRID_CENTER0
+    );
+    load_tetromino_sprite(
+        view,
+        state.get_in_next_tetromino_queue(1),
+        cursor_positions::NEXT_GRID_CENTER1
+    );
+    load_tetromino_sprite(
+        view,
+        state.get_in_next_tetromino_queue(2),
+        cursor_positions::NEXT_GRID_CENTER2
+    );
+}
+
 fn clear_section(view: &mut View, origin: usize, height: usize) {
     for k in 0..height {
         let line_origin = origin + k * view::SCREEN_WIDTH;
@@ -70,19 +107,6 @@ fn clear_section_line(view: &mut View, line_origin: usize) {
             view.vram[index] = EMPTY_CELL_CHAR;
         }
     }
-}
-
-fn load_hold_section(view: &mut View, state: &State) {
-    clear_section(
-        view,
-        cursor_positions::HOLD_GRID_ORIGIN,
-        view::HOLD_SECTION_HEIGHT
-    );
-    load_tetromino_sprite(
-        view,
-        state.get_hold_tetromino(),
-        cursor_positions::HOLD_GRID_CENTER
-    );
 }
 
 fn load_tetromino_sprite(view: &mut View, tetromino: Option<Tetromino>, center_screen_position: usize) {
