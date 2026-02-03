@@ -6,6 +6,11 @@ const LINES_FULL_CHECKING_TIME: u128 = 10;
 const DEFAULT_TETROMINO_FALLING_TIME: u128 = 80;
 const DELTA_FALLING_TIME: u128 = 5;
 
+const EARNED_POINTS_SINGLE: u32 = 10;
+const EARNED_POINTS_DOUBLE: u32 = 30;
+const EARNED_POINTS_TRIPLE: u32 = 50;
+const EARNED_POINTS_TETRIS: u32 = 80;
+
 impl State {
     fn move_current_tetromino_left(&mut self) {
         let collisions = self
@@ -104,13 +109,29 @@ impl State {
     }
 
     fn clear_grid_lines_full(&mut self) {
-    for i in 0..game::GRID_HEIGHT {
-        if self.is_grid_line_full(i) {
-            self.clear_grid_line(i);
-            self.shift_tetromino_cells_down(i);
+        let old_lines_counter = self.get_lines();
+
+        for i in 0..game::GRID_HEIGHT {
+            if self.is_grid_line_full(i) {
+                self.clear_grid_line(i);
+                self.shift_tetromino_cells_down(i);
+            }
+        }
+
+        let new_lines_counter = self.get_lines();
+
+        match new_lines_counter - old_lines_counter {
+            1 => self.add_to_score(EARNED_POINTS_SINGLE * self.get_level()),
+            2 => self.add_to_score(EARNED_POINTS_DOUBLE * self.get_level()),
+            3 => self.add_to_score(EARNED_POINTS_TRIPLE * self.get_level()),
+            4 => self.add_to_score(EARNED_POINTS_TETRIS * self.get_level()),
+            _ => ()
+        }
+
+        if old_lines_counter / 10 < new_lines_counter / 10 {
+            self.increment_level();
         }
     }
-}
 
     fn swap_current_stored_tetrominos(&mut self) {
         if self.can_store() {

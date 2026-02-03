@@ -136,14 +136,6 @@ impl State {
         self.current_tetromino.tetromino
     }
 
-    pub fn get_current_tetromino_position(&self) -> GridCoords {
-        self.current_tetromino.position
-    }
-
-    pub fn get_current_tetromino_rotation(&self) -> usize {
-        self.current_tetromino.rotation
-    }
-
     pub fn get_stored_tetromino(&self) -> Option<Tetromino> {
         self.hold
     }
@@ -190,11 +182,6 @@ impl State {
 
     pub fn increment_level(&mut self) {
         self.level += 1;
-    }
-
-    pub fn decrement_level(&mut self) {
-        let l = self.level;
-        self.level = if l > 0 {l - 1} else {l};
     }
 
     pub fn increment_rotation(&mut self) {
@@ -278,5 +265,9 @@ impl State {
 
         self.set_grid_cell(1, j, cell);
         self.set_grid_cell(0, j, Cell::Empty);
+    }
+
+    pub fn add_to_score(&mut self, amount: u32) {
+        self.score += amount
     }
 }

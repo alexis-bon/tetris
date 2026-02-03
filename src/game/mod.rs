@@ -8,6 +8,8 @@ const GRID_LENGTH: usize = GRID_HEIGHT * GRID_WIDTH;
 
 const NEXT_TETROMINOS_QUEUE_SIZE: usize = 3;
 
+const SLEEP_TIME_BETWEEN_FRAMES_MILLIS: u64 = 10;
+
 mod tetromino;
 mod tetromino_collision;
 mod cell;
@@ -28,7 +30,6 @@ pub fn start_game() -> Result<(), String> {
         Err(e) => return Err(e.to_string()),
     };
 
-    let tmp = b'A';
 
     loop {
 
@@ -38,8 +39,6 @@ pub fn start_game() -> Result<(), String> {
             } else {
                 core::perform_action(&mut state, next_action);
             }
-        } else {
-            view_struct.vram[1] = if view_struct.vram[1] < b'Z' {view_struct.vram[1] + 1} else {b'A'};
         }
 
         core::increment_clock_and_trigger_events(&mut state);
@@ -49,7 +48,7 @@ pub fn start_game() -> Result<(), String> {
             io::Result::Err(e) => return Err(e.to_string())
         }
 
-        std::thread::sleep(Duration::from_millis(10));
+        std::thread::sleep(Duration::from_millis(SLEEP_TIME_BETWEEN_FRAMES_MILLIS));
     }
     match view::close_view(&mut view_struct) {
         Ok(_) => (),
