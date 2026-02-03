@@ -1,9 +1,8 @@
-pub const SCORE_COUNTER: usize = 908;
-pub const LEVEL_COUNTER: usize = 1115;
-pub const LINES_COUNTER: usize = 1322;
+pub const SCORE_COUNTER: usize = 563;
+pub const LEVEL_COUNTER: usize = 770;
+pub const LINES_COUNTER: usize = 977;
 
 pub const GRID_ORIGIN: usize = 90;
-pub const GRID_END: usize = 1429;
 
 pub const HOLD_GRID_ORIGIN: usize = 143;
 pub const HOLD_GRID_CENTER: usize = 215;
