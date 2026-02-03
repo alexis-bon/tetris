@@ -25,7 +25,7 @@ use crate::game::game_action::GameAction;
 pub fn start_game() -> Result<(), String> {
     let mut state = state::State::new();
 
-    let mut view_struct = match view::initialize_view("data/screen.txt") {
+    let mut view_struct = match view::initialize_view() {
         Ok (view_struct) => view_struct,
         Err(e) => return Err(e.to_string()),
     };

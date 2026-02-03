@@ -1,19 +1,16 @@
-use std::{fs, io, ptr};
+use std::ptr;
 
 use crate::game;
 use crate::game::state::{State, CurrentTetromino};
 use crate::game::cell::Cell;
+use crate::game::view::screen;
 use crate::game::view::{self, View, cursor_positions, tetromino_sprite::TetrominoSprite};
 
 const TETROMINO_CELL_CHAR: u8 = b'H';
 const EMPTY_CELL_CHAR: u8 = b' ';
 
-pub fn initialize(file_path: &str) -> io::Result<[u8; view::SCREEN_LENGTH]> {
-    let mut file = fs::File::open(file_path)?;
-    let mut content_string = String::new();
-
-    io::Read::read_to_string(&mut file, &mut content_string)?;
-    content_string = content_string.replace("\n", "\n\r");
+pub fn initialize() -> [u8; view::SCREEN_LENGTH] {
+    let content_string = screen::SCREEN_STR.replace("\n", "\n\r");
     let content_bytes = content_string.as_bytes();
 
     let mut vram = [b' '; view::SCREEN_LENGTH];
@@ -25,7 +22,7 @@ pub fn initialize(file_path: &str) -> io::Result<[u8; view::SCREEN_LENGTH]> {
         );
     }
 
-    Ok(vram)
+    vram
 }
 
 pub fn load_state_data(state: &State, view: &mut View) {

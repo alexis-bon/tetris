@@ -2,8 +2,8 @@ pub mod input;
 
 mod cursor_positions;
 mod vram;
-
 mod tetromino_sprite;
+mod screen;
 
 use std::io::{self, Write};
 use crossterm::{
@@ -31,7 +31,7 @@ pub struct View {
     
 }
 
-pub fn initialize_view(file_path: &str) -> io::Result<View> {
+pub fn initialize_view() -> io::Result<View> {
     terminal::enable_raw_mode()?;
 
     let mut stdout = io::stdout();
@@ -39,7 +39,7 @@ pub fn initialize_view(file_path: &str) -> io::Result<View> {
 
     Ok(
         View {
-            vram: vram::initialize(file_path)?,
+            vram: vram::initialize(),
             stdout,
     })
 }
