@@ -3,11 +3,9 @@ use crate::game::{state::CurrentTetromino, tetromino::Tetromino};
 use crate::game::view::{self, cursor_positions};
 
 pub struct TetrominoSprite {
-    pub tetromino: Tetromino,
     pub cells_screen_position: (Option<usize>, Option<usize>, Option<usize>, Option<usize>)
 }
 
-const GRID_ORIGIN_I32 : i32 = cursor_positions::GRID_ORIGIN as i32;
 const SCREEN_WIDTH_I32: i32 = view::SCREEN_WIDTH as i32;
 const CELL_WIDTH_I32  : i32 = view::CELL_WIDTH as i32;
 
@@ -16,7 +14,6 @@ impl TetrominoSprite {
         -> TetrominoSprite {
         
         TetrominoSprite {
-            tetromino,
             cells_screen_position: Self::get_screen_cells_from_shape(
                     center_screen_position,
                     tetromino.get_display_shape()
@@ -29,7 +26,6 @@ impl TetrominoSprite {
     ) -> TetrominoSprite {
 
         TetrominoSprite {
-            tetromino: current_tetromino.get_tetromino(),
             cells_screen_position: Self::get_screen_cells_from_shape(
                 current_tetromino.get_position().to_screen_index(),
                 current_tetromino.get_shape()
