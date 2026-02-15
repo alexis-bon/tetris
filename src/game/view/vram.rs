@@ -33,6 +33,7 @@ pub fn load_state_data(state: &State, view: &mut View) {
     load_uint(view, state.get_score(), cursor_positions::SCORE_COUNTER);
     load_uint(view, state.get_level(), cursor_positions::LEVEL_COUNTER);
     load_uint(view, state.get_lines(), cursor_positions::LINES_COUNTER);
+    load_pause_message_if_needed(view, state);
 }
 
 fn load_grid(state: &State, view: &mut View) {
@@ -108,20 +109,6 @@ fn load_next_section_part(view: &mut View, state: &State, queue_index: usize, sc
     );
 }
 
-// fn load_tetromino_sprite(view: &mut View, tetromino: Option<Tetromino>, center_screen_position: usize) {
-//     if let Some(tetromino) = tetromino {
-//         let sprite = TetrominoSprite::display_sprite(
-//             tetromino,
-//             center_screen_position
-//         );
-
-//         load_tetromino_cell(view, sprite.cells_grid_position.0);
-//         load_tetromino_cell(view, sprite.cells_grid_position.1);
-//         load_tetromino_cell(view, sprite.cells_grid_position.2);
-//         load_tetromino_cell(view, sprite.cells_grid_position.3);
-//     }
-// }
-
 fn load_tetromino_sprite(view: &mut View, sprite: TetrominoSprite) {
     if let Some(cell0_screen_position) = sprite.cells_screen_position.0 {
         load_tetromino_cell(view, cell0_screen_position);
@@ -174,4 +161,36 @@ fn load_uint(view: &mut View, n: u32, position: usize) {
 fn digit_to_utf8(digit: u8) -> u8 {
     let utf8_zero = b'0' as u8;
     utf8_zero + digit
+}
+
+fn load_pause_message_if_needed(view: &mut View, state: &State) {
+    let message_origin = cursor_positions::PAUSE_MESSAGE;
+
+    if state.is_game_paused() {
+        load_pause_message(view, message_origin);
+    } else {
+        clear_pause_message(view, message_origin);
+    }
+}
+
+fn load_pause_message(view: &mut View, message_origin: usize) {
+    view.vram[message_origin     ] = b'G';
+    view.vram[message_origin +  1] = b'A';
+    view.vram[message_origin +  2] = b'M';
+    view.vram[message_origin +  3] = b'E';
+
+    view.vram[message_origin +  5] = b'P';
+    view.vram[message_origin +  6] = b'A';
+    view.vram[message_origin +  7] = b'U';
+    view.vram[message_origin +  8] = b'S';
+    view.vram[message_origin +  9] = b'E';
+    view.vram[message_origin + 10] = b'D';
+}
+
+fn clear_pause_message(view: &mut View, message_origin: usize) {
+    let message_length = 11;
+
+    for i in 0..message_length {
+        view.vram[message_origin + i] = b' ';
+    }
 }

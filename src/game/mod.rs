@@ -30,18 +30,23 @@ pub fn start_game() -> Result<(), String> {
         Err(e) => return Err(e.to_string()),
     };
 
-
     loop {
 
         if let Some(next_action) = view::input::read() {
-            if let GameAction::Quit = next_action {
-                break;
-            } else {
-                core::perform_action(&mut state, next_action);
+            match next_action {
+                GameAction::Quit => break,
+                GameAction::Pause => state.flip_paused_flag(),
+                _ => {
+                    if !state.is_game_paused() {
+                        core::perform_action(&mut state, next_action);
+                    }
+                }
             }
         }
 
-        core::increment_clock_and_trigger_events(&mut state);
+        if !state.is_game_paused() {
+            core::increment_clock_and_trigger_events(&mut state);
+        }
 
         match view::display_state(&state, &mut view_struct) {
             Ok(_) => (),

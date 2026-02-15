@@ -1,6 +1,7 @@
 pub const SCORE_COUNTER: usize = 563;
 pub const LEVEL_COUNTER: usize = 770;
 pub const LINES_COUNTER: usize = 977;
+pub const PAUSE_MESSAGE: usize = 1178;
 
 pub const GRID_ORIGIN: usize = 90;
 
