@@ -16,7 +16,7 @@ pub fn read() -> Option<GameAction> {
                         KeyCode::Char('r') => Some(GameAction::Rotate),
                         KeyCode::Char('s') => Some(GameAction::Store),
                         KeyCode::Char('p') => Some(GameAction::Pause),
-                        KeyCode::Esc => Some(GameAction::Quit),
+                        KeyCode::Char('q') => Some(GameAction::Quit),
                         _ => None
                     }
                 }
