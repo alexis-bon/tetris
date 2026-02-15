@@ -91,7 +91,8 @@ pub struct State {
     level: u32,
     lines: u32,
     clock: u128,
-    rng: rand::rngs::ThreadRng
+    rng: rand::rngs::ThreadRng,
+    paused: bool
 }
 
 impl State {
@@ -116,7 +117,8 @@ impl State {
             level: 1,
             lines: 0,
             clock: 0,
-            rng: rand::rng()
+            rng: rand::rng(),
+            paused: false
         }
     }
 
@@ -162,6 +164,10 @@ impl State {
 
     pub fn get_clock(&self) -> u128 {
         self.clock
+    }
+
+    pub fn is_game_paused(&self) -> bool {
+        self.paused
     }
 
     pub fn is_grid_line_full(&self, i: usize) -> bool {
@@ -269,5 +275,9 @@ impl State {
 
     pub fn add_to_score(&mut self, amount: u32) {
         self.score += amount
+    }
+
+    pub fn flip_paused_flag(&mut self) {
+        self.paused = !self.paused
     }
 }
